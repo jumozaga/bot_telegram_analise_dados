@@ -10,7 +10,6 @@ from PIL import Image
 
 load_dotenv()
 
-
 class TelegramBot():
     def __init__(self):
         TOKEN = os.getenv("API_KEY")
@@ -29,8 +28,7 @@ class TelegramBot():
                         update_id = message['update_id']
                         chat_id = message['message']['from']['id']
                         message_text = message['message']['text']
-                        answer_bot, figure_boolean = self.create_answer(
-                            message_text)
+                        answer_bot, figure_boolean = self.create_answer(message_text)
                         self.send_answer(chat_id, answer_bot, figure_boolean)
                     except:
                         pass
@@ -41,11 +39,11 @@ class TelegramBot():
             link_request = f"{self.url}getUpdates?timeout=1000&offset={update_id + 1}"
         result = requests.get(link_request)
         return json.loads(result.content)
-
+    
     def create_answer(self, message_text):
         dataframe = transform_data(self.driveBot.get_data())
         message_text = message_text.lower()
-        if message_text in ["/start", "ola", "eae", "menu", "oi", "oie", "olá", "e aí", "eae", "e aê", "e ae", "e aê", "e aê"]:
+        if message_text in ["/start", "ola", "eae", "menu", "oi", "oie"]:
             return "Ola, tudo bem? Seja bem vindo ao Bot do RH da Empresa RDS. Selecione o que deseja:" + "\n" + "1 - NPS interno mensal médio por setor" + "\n" + "2 - NPS interno mensal médio por contratação" + "\n" + "3 - Distribuição do NPS interno" + "\n", 0
         elif message_text == '1':
             return barv_npsmean_by(dataframe, "Setor"), 1
@@ -55,7 +53,7 @@ class TelegramBot():
             return hist_nps(dataframe), 1
         else:
             return "Comando não encontrado, tente novamente. Selecione o que deseja:" + "\n" + "1 - NPS interno mensal médio por setor" + "\n" + "2 - NPS interno mensal médio por contratação" + "\n" + "3- Distribuição do NPS interno" + "\n", 0
-
+    
     def send_answer(self, chat_id, answer, figure_boolean):
         if figure_boolean == 0:
             link_to_send = f"{self.url}sendMessage?chat_id={chat_id}&text={answer}"
@@ -63,7 +61,6 @@ class TelegramBot():
             return
         else:
             answer.seek(0)
-            requests.post(f"{self.url}sendPhoto?chat_id={chat_id}",
-                          files=dict(photo=answer))
+            requests.post(f"{self.url}sendPhoto?chat_id={chat_id}", files = dict(photo=answer))
             answer.close()
             return
