@@ -64,3 +64,5 @@ class TelegramBot():
             requests.post(f"{self.url}sendPhoto?chat_id={chat_id}", files = dict(photo=answer))
             answer.close()
             return
+
+# Faz a comunicação com o bot
